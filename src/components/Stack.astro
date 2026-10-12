@@ -1,0 +1,51 @@
+---
+import { type Locale, copy } from '../content/site';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const t = copy[locale];
+---
+
+<section class="section site-shell" id="stack">
+  <p class="section-kicker">{t.nav.stack}</p>
+  <h2 class="section-title">{t.stack.title}</h2>
+  <p class="section-intro">{t.stack.intro}</p>
+
+  <div class="groups">
+    {
+      t.stack.groups.map((group) => (
+        <div>
+          <h3>{group.name}</h3>
+          <div class="tag-row">
+            {group.items.map((item) => (
+              <span class="tag">{item}</span>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .groups {
+    display: grid;
+    gap: 1.4rem;
+    margin-top: 2rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  h3 {
+    margin: 0 0 0.7rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+</style>

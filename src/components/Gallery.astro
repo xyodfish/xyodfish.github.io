@@ -1,0 +1,84 @@
+---
+import { type Locale, copy } from '../content/site';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const t = copy[locale];
+---
+
+<section class="section site-shell" id="gallery">
+  <p class="section-kicker">{t.nav.gallery}</p>
+  <h2 class="section-title">{t.gallery.title}</h2>
+  <p class="section-intro">{t.gallery.intro}</p>
+
+  <div class="grid">
+    {
+      t.gallery.items.map((item) => (
+        <figure>
+          <div class="frame">
+            {item.kind === 'video' ? (
+              <video autoplay muted loop playsinline preload="metadata">
+                <source src={item.src} type="video/mp4" />
+              </video>
+            ) : (
+              <img src={item.src} alt={item.caption} loading="lazy" />
+            )}
+          </div>
+          <figcaption>{item.caption}</figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 2rem;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  .frame {
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--line-strong);
+    background: #121816;
+    aspect-ratio: 4 / 3;
+    box-shadow: 0 16px 36px rgba(14, 19, 17, 0.08);
+  }
+
+  video,
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  figcaption {
+    margin-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+  }
+
+  @media (max-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

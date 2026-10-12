@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import type { Locale } from '../content/site';
+
+type Props = {
+  locale: Locale;
+  title: string;
+  description: string;
+};
+
+const { locale, title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const alternateZh = new URL('/', Astro.site).toString();
+const alternateEn = new URL('/en/', Astro.site).toString();
+---
+
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="zh-CN" href={alternateZh} />
+    <link rel="alternate" hreflang="en" href={alternateEn} />
+    <link rel="alternate" hreflang="x-default" href={alternateZh} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400..700;1,400..700&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <script>
+      const nodes = document.querySelectorAll('.reveal');
+
+      if ('IntersectionObserver' in window && nodes.length) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-in');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.16, rootMargin: '0px 0px -8% 0px' },
+        );
+
+        nodes.forEach((node) => observer.observe(node));
+      } else {
+        nodes.forEach((node) => node.classList.add('is-in'));
+      }
+    </script>
+  </body>
+</html>

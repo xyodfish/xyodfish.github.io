@@ -1,0 +1,80 @@
+---
+import { type Locale, copy } from '../content/site';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const t = copy[locale];
+---
+
+<section class="section site-shell" id="method">
+  <p class="section-kicker">{t.nav.method}</p>
+  <h2 class="section-title">{t.method.title}</h2>
+  <p class="section-intro">{t.method.intro}</p>
+
+  <ol>
+    {
+      t.method.steps.map((step, index) => (
+        <li>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <div>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style>
+  ol {
+    list-style: none;
+    margin: 2.2rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  li {
+    padding: 1.2rem 1.1rem 1.35rem;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--panel);
+    backdrop-filter: blur(8px);
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent);
+  }
+
+  h3 {
+    margin: 0.7rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    margin: 0.55rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.96rem;
+  }
+
+  @media (max-width: 900px) {
+    ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    ol {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

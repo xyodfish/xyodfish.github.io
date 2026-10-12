@@ -1,0 +1,142 @@
+---
+import SectionHead from './SectionHead.astro';
+import { type Locale, copy } from '../content/site';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+const t = copy[locale];
+---
+
+<section class="section demos" id="demos">
+  <div class="site-shell">
+    <div class="reveal">
+      <SectionHead
+        kicker={t.nav.demos}
+        title={locale === 'zh' ? '更多片段' : 'More clips'}
+        intro={
+          locale === 'zh'
+            ? '补充镜头；进入视口才播放。'
+            : 'Extra footage; plays when in view.'
+        }
+      />
+    </div>
+
+    {
+      t.demoGroups.map((group) => (
+        <div class="group reveal">
+          <h3>{group.label}</h3>
+          <div class="strip">
+            {group.items.map((item) => (
+              <figure>
+                <div class="frame">
+                  {item.kind === 'video' ? (
+                    <video muted loop playsinline preload="none" data-lazy-video>
+                      <source src={item.src} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img src={item.src} alt={item.caption} loading="lazy" />
+                  )}
+                </div>
+                <figcaption>{item.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .demos {
+    background: rgba(18, 24, 22, 0.04);
+    border-block: 1px solid var(--line);
+  }
+
+  .group + .group {
+    margin-top: 1.75rem;
+  }
+
+  .group h3 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  .frame {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #0f1412;
+    aspect-ratio: 16 / 11;
+  }
+
+  video,
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  figcaption {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 960px) {
+    .strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .strip {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const videos = document.querySelectorAll('#demos [data-lazy-video]');
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+
+          if (entry.isIntersecting) {
+            if (video.readyState < 2) {
+              video.load();
+            }
+
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.35 },
+    );
+
+    videos.forEach((video) => observer.observe(video));
+  }
+</script>

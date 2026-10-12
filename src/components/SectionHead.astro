@@ -1,0 +1,26 @@
+---
+type Props = {
+  kicker: string;
+  title: string;
+  intro?: string;
+};
+
+const { kicker, title, intro } = Astro.props;
+---
+
+<header class="section-head">
+  <p class="section-kicker">{kicker}</p>
+  <h2 class="section-title">{title}</h2>
+  {intro && <p class="section-intro">{intro}</p>}
+</header>
+
+<style>
+  .section-head {
+    max-width: 38rem;
+    margin-bottom: clamp(2rem, 4vw, 2.75rem);
+  }
+
+  .section-title {
+    max-width: 14ch;
+  }
+</style>
