@@ -3,6 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Hero from '../../components/Hero.astro';
 import Work from '../../components/Work.astro';
+import SystemAtlas from '../../components/SystemAtlas.astro';
+import EvidenceLab from '../../components/EvidenceLab.astro';
+import About from '../../components/About.astro';
 import Demos from '../../components/Demos.astro';
 import Contact from '../../components/Contact.astro';
 import Footer from '../../components/Footer.astro';
@@ -17,6 +20,9 @@ const t = copy[locale];
   <main>
     <Hero locale={locale} />
     <Work locale={locale} />
+    <SystemAtlas locale={locale} />
+    <EvidenceLab locale={locale} />
+    <About locale={locale} />
     <Demos locale={locale} />
     <Contact locale={locale} />
   </main>

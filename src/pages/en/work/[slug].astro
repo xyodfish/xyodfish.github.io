@@ -1,0 +1,15 @@
+---
+import CaseStudyPage from '../../../components/CaseStudyPage.astro';
+import { caseSlugs, caseStudies } from '../../../content/cases';
+
+export function getStaticPaths() {
+  return caseSlugs.map((slug) => ({
+    params: { slug },
+    props: { study: caseStudies.en[slug] },
+  }));
+}
+
+const { study } = Astro.props;
+---
+
+<CaseStudyPage locale="en" study={study} />

@@ -1,0 +1,736 @@
+---
+import type { Locale } from '../content/site';
+
+type Props = {
+  locale: Locale;
+};
+
+const { locale } = Astro.props;
+
+const content = {
+  zh: {
+    kicker: '工程证据 / 03',
+    title: '不只展示结果，也展示它如何成立。',
+    intro: '系统图回答“怎么工作”，这里继续回答三个问题：动作怎样走完整条链路、训练判断依据是什么、数据凭什么进入下一阶段。',
+    journey: {
+      eyebrow: '端到端运动链路',
+      title: '一条动作，从人体输入走到机器人执行。',
+      summary: '离线数据与实时输入不会机械地经过完全相同的节点，但共享明确的数据边界，因此筛选、重定向、训练和控制可以独立替换。',
+      steps: [
+        { title: '获得动作', body: '视觉、动捕或文件回放', tool: 'RealSense · Noitom · Video' },
+        { title: '检查与统一', body: '确认时间、旋转和数据质量', tool: 'Motion Miner · MotionBridge' },
+        { title: '适配机器人', body: '把人体目标转换到机器人结构', tool: 'GMR · UMR · SOMA' },
+        { title: '训练或实时传递', body: '构建数据集，或直接产生动作参考', tool: 'H2 Policy · Realtime Target' },
+        { title: '运行控制', body: '安全处理、策略推理与关节控制', tool: 'PUPPET · Policy Runtime' },
+        { title: '执行与验证', body: '进入仿真或硬件后端并返回状态', tool: 'MuJoCo · Hardware Backend' },
+      ],
+      note: '证据边界：不同项目目前覆盖到的验证阶段不同；仿真闭环、设备接口和真机结果分别表述。',
+    },
+    experiment: {
+      eyebrow: 'H2 受控实验',
+      title: '慢一点落脚，就一定更安全吗？',
+      summary: '在相同起始状态下，只短暂减小踝关节的策略残差，再观察触地速度、接触力和后续跟踪。',
+      facts: [
+        { value: '4', label: '固定落脚事件' },
+        { value: '20', label: '有效闭环回放' },
+        { value: '40 ms', label: '局部干预窗口' },
+      ],
+      chartLabel: '触地点接近地面的速度 · m/s',
+      before: '原动作',
+      after: '减小踝动作',
+      events: [
+        { label: '直走 · 右脚', before: 3.281, after: 1.833, change: '−44.1%', beforeWidth: 100, afterWidth: 56 },
+        { label: '直走 · 左脚', before: 2.66, after: 2.161, change: '−18.8%', beforeWidth: 81, afterWidth: 66 },
+        { label: '绕圈 · 左脚', before: 1.324, after: 1.027, change: '−22.5%', beforeWidth: 40, afterWidth: 31 },
+        { label: '绕圈 · 右脚', before: 2.354, after: 2.101, change: '−10.7%', beforeWidth: 72, afterWidth: 64 },
+      ],
+      conclusionLabel: '实验结论',
+      conclusion: '4个事件的触地速度都下降，但峰值接触力没有一致下降。因此可以确认踝动作参与了高速触地，却不能把“减小踝输出”直接当成完整修复。',
+      cta: '查看H2训练案例',
+      href: '/work/h2-motion-tracking/',
+    },
+    quality: {
+      eyebrow: '动作数据质量门',
+      title: '不是每段人体动作都直接进入训练。',
+      summary: 'Video Motion Miner 不重新运行人体估计模型，而是检查已有输出，保留原文件，并生成可追溯的筛选结论。',
+      sourcesLabel: '已有估计结果',
+      sources: ['GVHMR', 'Video-OnlineHMR'],
+      gates: [
+        { title: '统一表示', body: '根节点平移 + 关节旋转矩阵' },
+        { title: '验证时间', body: '明确帧率、帧范围与来源' },
+        { title: '检查运动', body: '用旋转几何距离识别异常跳变' },
+        { title: '标记边界', body: '提示首尾静止段，不自动裁掉原数据' },
+      ],
+      outputLabel: '筛选清单',
+      output: '记录来源、提取器、帧范围、指标、结论，以及每一条拒绝原因。',
+      accepted: '可进入重定向 / 训练',
+      rejected: '带明确原因退回',
+    },
+  },
+  en: {
+    kicker: 'Engineering evidence / 03',
+    title: 'Show not only the result, but why it holds.',
+    intro: 'The system maps explain how things work. This section asks three more questions: how motion crosses the full stack, what supports a training decision, and why data may proceed.',
+    journey: {
+      eyebrow: 'End-to-end motion path',
+      title: 'One motion, from human input to robot execution.',
+      summary: 'Offline data and live input do not mechanically pass through every identical node. They share explicit contracts, so screening, retargeting, learning, and control remain replaceable.',
+      steps: [
+        { title: 'Acquire motion', body: 'Vision, mocap, or recorded playback', tool: 'RealSense · Noitom · Video' },
+        { title: 'Inspect & normalize', body: 'Verify timing, rotations, and quality', tool: 'Motion Miner · MotionBridge' },
+        { title: 'Fit the robot', body: 'Map human targets to robot structure', tool: 'GMR · UMR · SOMA' },
+        { title: 'Learn or stream', body: 'Build a dataset or emit live references', tool: 'H2 Policy · Realtime Target' },
+        { title: 'Run control', body: 'Safety, policy inference, and joint control', tool: 'PUPPET · Policy Runtime' },
+        { title: 'Execute & verify', body: 'Enter simulation or hardware; return state', tool: 'MuJoCo · Hardware Backend' },
+      ],
+      note: 'Evidence boundary: projects currently reach different validation stages. Simulation loops, device interfaces, and hardware results are stated separately.',
+    },
+    experiment: {
+      eyebrow: 'H2 controlled experiment',
+      title: 'Does a slower landing necessarily mean a safer one?',
+      summary: 'From identical initial states, only the policy’s ankle residual was briefly reduced. Touchdown speed, contact force, and subsequent tracking were then measured.',
+      facts: [
+        { value: '4', label: 'Fixed touchdown events' },
+        { value: '20', label: 'Valid closed-loop replays' },
+        { value: '40 ms', label: 'Local intervention' },
+      ],
+      chartLabel: 'Contact-point approach speed · m/s',
+      before: 'Original action',
+      after: 'Reduced ankle action',
+      events: [
+        { label: 'Straight · right', before: 3.281, after: 1.833, change: '−44.1%', beforeWidth: 100, afterWidth: 56 },
+        { label: 'Straight · left', before: 2.66, after: 2.161, change: '−18.8%', beforeWidth: 81, afterWidth: 66 },
+        { label: 'Circle · left', before: 1.324, after: 1.027, change: '−22.5%', beforeWidth: 40, afterWidth: 31 },
+        { label: 'Circle · right', before: 2.354, after: 2.101, change: '−10.7%', beforeWidth: 72, afterWidth: 64 },
+      ],
+      conclusionLabel: 'What this supports',
+      conclusion: 'Approach speed fell in all four events, but peak contact force did not fall consistently. The ankle action contributed to fast touchdown; simply reducing it is not yet a complete fix.',
+      cta: 'Read the H2 training case',
+      href: '/en/work/h2-motion-tracking/',
+    },
+    quality: {
+      eyebrow: 'Motion-data quality gate',
+      title: 'Not every estimated motion goes straight into training.',
+      summary: 'Video Motion Miner does not rerun a human-motion model. It inspects existing outputs, preserves the source artifact, and emits a traceable screening decision.',
+      sourcesLabel: 'Existing estimates',
+      sources: ['GVHMR', 'Video-OnlineHMR'],
+      gates: [
+        { title: 'Normalize', body: 'Root translation + joint rotation matrices' },
+        { title: 'Verify time', body: 'Explicit frame rate, range, and source' },
+        { title: 'Check motion', body: 'Rotation geometry exposes implausible jumps' },
+        { title: 'Mark boundaries', body: 'Suggest stationary ends; never trim silently' },
+      ],
+      outputLabel: 'Screening manifest',
+      output: 'Records source, extractor, frame range, metrics, decision, and every rejection reason.',
+      accepted: 'Proceed to retargeting / training',
+      rejected: 'Return with explicit reasons',
+    },
+  },
+} as const;
+
+const c = content[locale];
+---
+
+<section class="section evidence" id="evidence">
+  <div class="site-shell">
+    <header class="evidence-head reveal">
+      <div>
+        <p class="section-kicker">{c.kicker}</p>
+        <h2>{c.title}</h2>
+      </div>
+      <p>{c.intro}</p>
+    </header>
+
+    <article class="evidence-card journey-card reveal">
+      <header class="card-head">
+        <div>
+          <p>{c.journey.eyebrow}</p>
+          <h3>{c.journey.title}</h3>
+        </div>
+        <span>01</span>
+      </header>
+      <p class="card-summary">{c.journey.summary}</p>
+      <ol class="journey-flow" aria-label={c.journey.title}>
+        {
+          c.journey.steps.map((step, index) => (
+            <li>
+              <small>{String(index + 1).padStart(2, '0')}</small>
+              <strong>{step.title}</strong>
+              <p>{step.body}</p>
+              <span>{step.tool}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="boundary-note">↳ {c.journey.note}</p>
+    </article>
+
+    <div class="story-grid">
+      <article class="evidence-card experiment-card reveal">
+        <header class="card-head">
+          <div>
+            <p>{c.experiment.eyebrow}</p>
+            <h3>{c.experiment.title}</h3>
+          </div>
+          <span>02</span>
+        </header>
+        <p class="card-summary">{c.experiment.summary}</p>
+
+        <dl class="fact-strip">
+          {
+            c.experiment.facts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <figure class="experiment-chart">
+          <figcaption>
+            <span>{c.experiment.chartLabel}</span>
+            <span class="legend"><i></i>{c.experiment.before}<i></i>{c.experiment.after}</span>
+          </figcaption>
+          <div class="event-list">
+            {
+              c.experiment.events.map((event) => (
+                <div class="event-row">
+                  <div class="event-label">
+                    <span>{event.label}</span>
+                    <strong>{event.change}</strong>
+                  </div>
+                  <div class="bar-pair">
+                    <div class="bar before" style={`--bar-width: ${event.beforeWidth}%`}><span>{event.before.toFixed(3)}</span></div>
+                    <div class="bar after" style={`--bar-width: ${event.afterWidth}%`}><span>{event.after.toFixed(3)}</span></div>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </figure>
+
+        <div class="conclusion">
+          <small>{c.experiment.conclusionLabel}</small>
+          <p>{c.experiment.conclusion}</p>
+        </div>
+        <a class="text-link" href={c.experiment.href}>{c.experiment.cta}<span aria-hidden="true">↗</span></a>
+      </article>
+
+      <article class="evidence-card quality-card reveal">
+        <header class="card-head">
+          <div>
+            <p>{c.quality.eyebrow}</p>
+            <h3>{c.quality.title}</h3>
+          </div>
+          <span>03</span>
+        </header>
+        <p class="card-summary">{c.quality.summary}</p>
+
+        <div class="quality-source">
+          <small>{c.quality.sourcesLabel}</small>
+          <div>{c.quality.sources.map((source) => <span>{source}</span>)}</div>
+        </div>
+
+        <ol class="quality-gates">
+          {
+            c.quality.gates.map((gate, index) => (
+              <li>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{gate.title}</strong>
+                  <p>{gate.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="manifest">
+          <small>{c.quality.outputLabel}</small>
+          <p>{c.quality.output}</p>
+          <div>
+            <span>✓ {c.quality.accepted}</span>
+            <span>× {c.quality.rejected}</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .evidence {
+    background:
+      linear-gradient(rgba(23, 25, 20, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23, 25, 20, 0.035) 1px, transparent 1px),
+      var(--paper-alt);
+    background-size: 42px 42px;
+  }
+
+  .evidence-head {
+    display: grid;
+    grid-template-columns: minmax(20rem, 1fr) minmax(20rem, 0.82fr);
+    align-items: end;
+    gap: clamp(2rem, 7vw, 7rem);
+    padding-bottom: clamp(2.5rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .evidence-head h2 {
+    max-width: 12ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5.4vw, 5.4rem);
+    font-weight: 720;
+    letter-spacing: -0.06em;
+    line-height: 0.92;
+  }
+
+  .evidence-head > p {
+    max-width: 35rem;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  .evidence-card {
+    min-width: 0;
+    background: rgba(245, 244, 237, 0.9);
+    border: 1px solid var(--line-strong);
+  }
+
+  .journey-card {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding: clamp(1.5rem, 3.5vw, 3rem);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .card-head p {
+    margin: 0;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .card-head h3 {
+    max-width: 17ch;
+    margin: 0.7rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.6vw, 3.8rem);
+    letter-spacing: -0.055em;
+    line-height: 0.96;
+  }
+
+  .story-grid .card-head h3 {
+    font-size: clamp(1.8rem, 2.8vw, 3rem);
+  }
+
+  .card-head > span {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+
+  .card-summary {
+    max-width: 48rem;
+    margin: 1.2rem 0 0;
+    color: var(--ink-soft);
+  }
+
+  .journey-flow {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.55rem;
+    margin: 2rem 0 0;
+    padding: 1rem;
+    border: 1px solid var(--line-strong);
+    background:
+      linear-gradient(rgba(72, 98, 14, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(72, 98, 14, 0.05) 1px, transparent 1px),
+      rgba(235, 233, 223, 0.48);
+    background-size: 22px 22px;
+    list-style: none;
+  }
+
+  .journey-flow li {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    min-height: 12rem;
+    flex-direction: column;
+    padding: 0.85rem;
+    border: 1px solid var(--line-strong);
+    background: rgba(245, 244, 237, 0.94);
+  }
+
+  .journey-flow li:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: -0.72rem;
+    display: grid;
+    place-items: center;
+    width: 0.88rem;
+    height: 0.88rem;
+    color: var(--paper);
+    background: var(--accent);
+    font-size: 0.55rem;
+    transform: translateY(-50%);
+  }
+
+  .journey-flow small,
+  .quality-source > small,
+  .manifest > small,
+  .conclusion small {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .journey-flow strong {
+    margin-top: 1.4rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.12;
+  }
+
+  .journey-flow p {
+    margin: 0.65rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+
+  .journey-flow li > span {
+    margin-top: auto;
+    padding-top: 1rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+    line-height: 1.45;
+  }
+
+  .boundary-note {
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(20rem, 0.82fr);
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .story-grid > article {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .fact-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin: 1.7rem 0 0;
+    background: var(--line-strong);
+    border: 1px solid var(--line-strong);
+  }
+
+  .fact-strip > div {
+    display: flex;
+    min-width: 0;
+    flex-direction: column-reverse;
+    padding: 0.85rem;
+    background: var(--paper);
+  }
+
+  .fact-strip dt {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.53rem;
+  }
+
+  .fact-strip dd {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.8rem);
+    font-weight: 720;
+    line-height: 1;
+  }
+
+  .experiment-chart {
+    margin: 1rem 0 0;
+    padding: 1rem;
+    border: 1px solid var(--line-strong);
+    background: var(--dark);
+  }
+
+  .experiment-chart figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--paper-muted);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+  }
+
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .legend i {
+    width: 0.55rem;
+    height: 0.55rem;
+    background: rgba(245, 244, 237, 0.26);
+  }
+
+  .legend i:last-of-type {
+    margin-left: 0.35rem;
+    background: var(--signal);
+  }
+
+  .event-list {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .event-row {
+    display: grid;
+    grid-template-columns: minmax(5.7rem, 0.32fr) minmax(0, 0.68fr);
+    gap: 0.8rem;
+  }
+
+  .event-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    color: var(--paper-muted);
+    font-size: 0.68rem;
+  }
+
+  .event-label strong {
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    font-weight: 500;
+  }
+
+  .bar-pair {
+    display: grid;
+    gap: 0.28rem;
+  }
+
+  .bar {
+    width: var(--bar-width);
+    min-width: 2.8rem;
+    height: 0.85rem;
+    background: rgba(245, 244, 237, 0.22);
+  }
+
+  .bar.after {
+    background: var(--signal);
+  }
+
+  .bar span {
+    display: block;
+    padding-left: 0.35rem;
+    color: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    line-height: 0.85rem;
+  }
+
+  .bar.after span {
+    color: var(--dark);
+  }
+
+  .conclusion {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(72, 98, 14, 0.08);
+  }
+
+  .conclusion p {
+    margin: 0.4rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.84rem;
+  }
+
+  .text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 1.25rem;
+    color: var(--accent);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .quality-source {
+    margin-top: 1.7rem;
+    padding: 1rem;
+    border: 1px solid var(--line-strong);
+    background: rgba(235, 233, 223, 0.62);
+  }
+
+  .quality-source > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+  }
+
+  .quality-source span {
+    padding: 0.35rem 0.55rem;
+    border: 1px solid var(--line-strong);
+    background: var(--paper);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+  }
+
+  .quality-gates {
+    margin: 0;
+    padding: 0;
+    border-inline: 1px solid var(--line-strong);
+    list-style: none;
+  }
+
+  .quality-gates li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.3rem 1fr;
+    gap: 0.8rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .quality-gates li > span {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+  }
+
+  .quality-gates strong {
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+
+  .quality-gates p {
+    margin: 0.2rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+
+  .manifest {
+    margin-top: 1rem;
+    padding: 1rem;
+    color: var(--paper);
+    background: var(--dark);
+  }
+
+  .manifest > small {
+    color: var(--signal);
+  }
+
+  .manifest p {
+    margin: 0.55rem 0 0;
+    color: var(--paper-muted);
+    font-size: 0.8rem;
+  }
+
+  .manifest > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 1rem;
+    background: rgba(245, 244, 237, 0.2);
+  }
+
+  .manifest span {
+    padding: 0.65rem;
+    color: var(--signal);
+    background: #0c0e0b;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+  }
+
+  .manifest span:last-child {
+    color: var(--paper-muted);
+  }
+
+  @media (max-width: 1040px) {
+    .journey-flow {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .journey-flow li:nth-child(3)::after {
+      content: none;
+    }
+
+    .story-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .evidence-head {
+      grid-template-columns: 1fr;
+      align-items: start;
+    }
+
+    .evidence-head h2 {
+      max-width: 10ch;
+    }
+
+    .journey-flow {
+      grid-template-columns: 1fr;
+    }
+
+    .journey-flow li {
+      min-height: 9rem;
+    }
+
+    .journey-flow li:nth-child(3)::after,
+    .journey-flow li:not(:last-child)::after {
+      top: auto;
+      right: 50%;
+      bottom: -0.72rem;
+      content: '↓';
+      transform: translateX(50%);
+    }
+
+    .experiment-chart figcaption,
+    .event-label {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .event-row {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
+
+    .fact-strip,
+    .manifest > div {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,5 +1,4 @@
 ---
-import SectionHead from './SectionHead.astro';
 import { type Locale, copy } from '../content/site';
 
 type Props = {
@@ -12,131 +11,174 @@ const t = copy[locale];
 
 <section class="section demos" id="demos">
   <div class="site-shell">
-    <div class="reveal">
-      <SectionHead
-        kicker={t.nav.demos}
-        title={locale === 'zh' ? '更多片段' : 'More clips'}
-        intro={
-          locale === 'zh'
-            ? '补充镜头；进入视口才播放。'
-            : 'Extra footage; plays when in view.'
-        }
-      />
-    </div>
+    <header class="demos-head reveal">
+      <div>
+        <p class="section-kicker">{t.nav.demos} / 05</p>
+        <h2>{locale === 'zh' ? '让运动本身成为证据。' : 'Let the motion be evidence.'}</h2>
+      </div>
+      <p>
+        {locale === 'zh'
+          ? '精选运行片段，不用重复视频淹没系统结构。每段都标明它实际展示的链路。'
+          : 'A small set of running clips. Each caption states the pipeline it actually demonstrates.'}
+      </p>
+    </header>
 
-    {
-      t.demoGroups.map((group) => (
-        <div class="group reveal">
-          <h3>{group.label}</h3>
-          <div class="strip">
-            {group.items.map((item) => (
-              <figure>
-                <div class="frame">
-                  {item.kind === 'video' ? (
-                    <video muted loop playsinline preload="none" data-lazy-video>
-                      <source src={item.src} type="video/mp4" />
-                    </video>
-                  ) : (
-                    <img src={item.src} alt={item.caption} loading="lazy" />
-                  )}
-                </div>
-                <figcaption>{item.caption}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-      ))
-    }
+    <div class="clip-grid reveal">
+      {
+        t.clips.map((clip, index) => (
+          <figure class={index === 0 || index === 3 ? 'wide' : ''}>
+            <div class="frame">
+              <video muted loop playsinline preload="none" data-lazy-video aria-label={clip.caption}>
+                <source src={clip.src} type="video/mp4" />
+              </video>
+              <span class="clip-no">{String(index + 1).padStart(2, '0')}</span>
+            </div>
+            <figcaption>
+              <strong>{clip.caption}</strong>
+              <span>{clip.context}</span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
   </div>
 </section>
 
 <style>
   .demos {
-    background: rgba(18, 24, 22, 0.04);
-    border-block: 1px solid var(--line);
+    color: var(--paper);
+    background: var(--dark);
   }
 
-  .group + .group {
-    margin-top: 1.75rem;
+  .demos :global(.section-kicker) {
+    color: var(--signal);
   }
 
-  .group h3 {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--muted);
+  .demos-head {
+    display: grid;
+    grid-template-columns: minmax(20rem, 1.3fr) minmax(16rem, 0.7fr);
+    align-items: end;
+    gap: 3rem;
+    padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
-  .strip {
+  .demos-head h2 {
+    max-width: 11ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 6vw, 6rem);
+    font-weight: 720;
+    letter-spacing: -0.065em;
+    line-height: 0.92;
+  }
+
+  .demos-head > p {
+    max-width: 27rem;
+    margin: 0;
+    color: var(--paper-muted);
+  }
+
+  .clip-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: clamp(1rem, 2vw, 1.5rem) 0.8rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(245, 244, 237, 0.16);
   }
 
   figure {
+    min-width: 0;
     margin: 0;
   }
 
-  .frame {
-    overflow: hidden;
-    border: 1px solid var(--line);
-    background: #0f1412;
-    aspect-ratio: 16 / 11;
+  figure.wide {
+    grid-column: span 2;
   }
 
-  video,
-  img {
+  .frame {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: #070907;
+  }
+
+  figure.wide .frame {
+    aspect-ratio: 16 / 7.9;
+  }
+
+  video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: saturate(0.82);
+    transition:
+      filter 350ms var(--ease),
+      transform 650ms var(--ease);
+  }
+
+  figure:hover video {
+    filter: saturate(1);
+    transform: scale(1.025);
+  }
+
+  .clip-no {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+    padding: 0.3rem 0.4rem;
+    color: var(--dark);
+    background: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
   }
 
   figcaption {
-    margin-top: 0.35rem;
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    color: var(--muted);
+    display: grid;
+    gap: 0.15rem;
+    margin-top: 0.65rem;
   }
 
-  @media (max-width: 960px) {
-    .strip {
+  figcaption strong {
+    font-family: var(--font-display);
+    font-size: 0.86rem;
+  }
+
+  figcaption span {
+    color: var(--paper-muted);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+  }
+
+  @media (max-width: 920px) {
+    .clip-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 520px) {
-    .strip {
+  @media (max-width: 680px) {
+    .demos-head {
       grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .clip-grid {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      margin-inline: -0.75rem;
+      padding: 1.25rem 0.75rem 1rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+    }
+
+    figure,
+    figure.wide {
+      flex: 0 0 82%;
+      scroll-snap-align: start;
+    }
+
+    figure.wide .frame {
+      aspect-ratio: 4 / 3;
     }
   }
 </style>
-
-<script>
-  const videos = document.querySelectorAll('#demos [data-lazy-video]');
-
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const video = entry.target as HTMLVideoElement;
-
-          if (entry.isIntersecting) {
-            if (video.readyState < 2) {
-              video.load();
-            }
-
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.35 },
-    );
-
-    videos.forEach((video) => observer.observe(video));
-  }
-</script>

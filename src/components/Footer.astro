@@ -3,45 +3,73 @@ import { siteMeta, type Locale, copy } from '../content/site';
 
 type Props = {
   locale: Locale;
+  languageHref?: string;
 };
 
-const { locale } = Astro.props;
+const { locale, languageHref } = Astro.props;
 const t = copy[locale];
 const year = new Date().getFullYear();
 ---
 
 <footer>
   <div class="site-shell inner">
-    <p><strong>{siteMeta.brand}</strong> · {t.footer.note}</p>
-    <p class="year">© {year}</p>
+    <p><span class="dot" aria-hidden="true"></span><strong>{siteMeta.brand}</strong> / {t.footer.note}</p>
+    <div>
+      <a href={languageHref ?? (locale === 'zh' ? '/en/' : '/')}>{t.nav.langOther}</a>
+      <a href="#content">{locale === 'zh' ? '回到顶部' : 'Back to top'} ↑</a>
+      <span>© {year}</span>
+    </div>
   </div>
 </footer>
 
 <style>
   footer {
-    padding: 1.75rem 0 2.6rem;
+    padding: 1.75rem 0 2.5rem;
+    background: var(--paper-alt);
   }
 
   .inner {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-strong);
     color: var(--muted);
-    font-size: 0.92rem;
+    font-size: 0.75rem;
+  }
+
+  p,
+  div {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0;
+  }
+
+  .dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent);
   }
 
   strong {
     color: var(--ink);
     font-family: var(--font-display);
+    font-size: 0.9rem;
     letter-spacing: -0.03em;
   }
 
-  .year {
-    font-family: var(--font-mono);
-    font-size: 0.76rem;
+  a {
+    color: var(--ink-soft);
+    text-decoration: none;
   }
 
-  p {
-    margin: 0;
+  @media (max-width: 620px) {
+    .inner {
+      align-items: flex-start;
+      flex-direction: column;
+    }
   }
 </style>

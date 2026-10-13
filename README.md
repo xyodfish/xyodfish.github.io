@@ -4,6 +4,8 @@ Personal site for **xyodfish** — robotics software / motion-control engineer.
 
 - Chinese: `/`
 - English: `/en/`
+- Bilingual case studies: `/work/<case>/` and `/en/work/<case>/`
+- Responsive editorial layout with viewport-aware demo playback
 
 ## Local
 

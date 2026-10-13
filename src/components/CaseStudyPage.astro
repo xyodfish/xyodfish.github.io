@@ -1,0 +1,778 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import { copy, type Locale } from '../content/site';
+import { caseSlugs, caseStudies, type CaseStudy } from '../content/cases';
+
+type Props = {
+  locale: Locale;
+  study: CaseStudy;
+};
+
+const { locale, study } = Astro.props;
+const t = copy[locale];
+const homeHref = locale === 'zh' ? '/' : '/en/';
+const currentPath = `/work/${study.slug}/`;
+const englishPath = `/en${currentPath}`;
+const languageHref = locale === 'zh' ? englishPath : currentPath;
+const currentIndex = caseSlugs.indexOf(study.slug);
+const nextSlug = caseSlugs[(currentIndex + 1) % caseSlugs.length];
+const nextStudy = caseStudies[locale][nextSlug];
+const nextHref = locale === 'zh' ? `/work/${nextSlug}/` : `/en/work/${nextSlug}/`;
+const labels = locale === 'zh'
+  ? {
+      back: '返回全部案例',
+      overview: '项目目标',
+      scope: '我做了什么',
+      flow: '从输入到结果',
+      decisions: '设计取舍',
+      evidence: '验证结果',
+      limitations: '证据边界',
+      gallery: '运行片段',
+      next: '下一个案例',
+    }
+  : {
+      back: 'Back to all cases',
+      overview: 'Project goal',
+      scope: 'What I built',
+      flow: 'From input to result',
+      decisions: 'Design choices',
+      evidence: 'Validation results',
+      limitations: 'Evidence boundary',
+      gallery: 'Running clips',
+      next: 'Next case',
+    };
+---
+
+<BaseLayout
+  locale={locale}
+  title={`${study.title} · ${study.category} · xyodfish`}
+  description={study.metaDescription}
+  alternateZhPath={currentPath}
+  alternateEnPath={englishPath}
+>
+  <Header locale={locale} languageHref={languageHref} />
+  <main id="content">
+    <section class="case-hero">
+      <div class="site-shell">
+        <a class="back" href={`${homeHref}#work`}><span aria-hidden="true">←</span>{labels.back}</a>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow">CASE {study.number} / {study.category}</p>
+            <h1>{study.title}</h1>
+            <p class="summary">{study.summary}</p>
+          </div>
+          <figure class="hero-media">
+            {
+              study.heroMedia ? (
+                <>
+                  <video muted loop playsinline preload="none" data-lazy-video aria-label={study.heroMedia.alt}>
+                    <source src={study.heroMedia.src} type="video/mp4" />
+                  </video>
+                  <figcaption>{study.heroMedia.caption}</figcaption>
+                </>
+              ) : (
+                <div class="hero-architecture" aria-label={labels.flow}>
+                  {study.flow.slice(0, 5).map((step, index) => (
+                    <>
+                      <span>{step}</span>
+                      {index < 4 && <i aria-hidden="true">→</i>}
+                    </>
+                  ))}
+                </div>
+              )
+            }
+          </figure>
+        </div>
+        <div class="facts">
+          {
+            study.facts.map((fact) => (
+              <div>
+                <strong>{fact.value}</strong>
+                <span>{fact.label}</span>
+                {fact.note && <small>{fact.note}</small>}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section narrative">
+      <div class="site-shell two-column">
+        <div>
+          <p class="section-kicker">01 / {labels.overview}</p>
+          <h2>{labels.overview}</h2>
+        </div>
+        <div class="prose">
+          {study.overview.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+      <div class="site-shell scope-grid">
+        <div>
+          <p class="section-kicker">02 / {labels.scope}</p>
+          <h2>{labels.scope}</h2>
+        </div>
+        <ol>
+          {study.responsibility.map((item) => <li>{item}</li>)}
+        </ol>
+      </div>
+    </section>
+
+    <section class="flow-section">
+      <div class="site-shell">
+        <p class="section-kicker">03 / {labels.flow}</p>
+        <h2>{labels.flow}</h2>
+        <div class="flow-map" style={`--flow-count: ${study.flow.length}`}>
+          {
+            study.flow.map((step, index) => (
+              <div class="flow-node">
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{step}</strong>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section decisions">
+      <div class="site-shell">
+        <header class="section-head">
+          <p class="section-kicker">04 / {labels.decisions}</p>
+          <h2>{labels.decisions}</h2>
+        </header>
+        <div class="decision-grid">
+          {
+            study.decisions.map((decision, index) => (
+              <article>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <h3>{decision.title}</h3>
+                <p>{decision.body}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="section evidence-section">
+      <div class="site-shell">
+        <header class="section-head inverse">
+          <p class="section-kicker">05 / {labels.evidence}</p>
+          <h2>{labels.evidence}</h2>
+        </header>
+        <div class="evidence-grid">
+          {
+            study.evidence.map((item) => (
+              <article>
+                <strong>{item.value}</strong>
+                <h3>{item.label}</h3>
+                <p>{item.detail}</p>
+              </article>
+            ))
+          }
+        </div>
+        <div class="limitations">
+          <p>{labels.limitations}</p>
+          <ul>
+            {study.limitations.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    {
+      study.gallery.length > 0 && (
+        <section class="section gallery-section">
+          <div class="site-shell">
+            <header class="section-head">
+              <p class="section-kicker">06 / {labels.gallery}</p>
+              <h2>{labels.gallery}</h2>
+            </header>
+            <div class="gallery">
+              {study.gallery.map((media) => (
+                <figure>
+                  <video muted loop playsinline preload="none" data-lazy-video aria-label={media.alt}>
+                    <source src={media.src} type="video/mp4" />
+                  </video>
+                  <figcaption>{media.caption}</figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <a class="next-case" href={nextHref}>
+      <span>{labels.next} / {nextStudy.category}</span>
+      <strong>{nextStudy.title}</strong>
+      <i aria-hidden="true">→</i>
+    </a>
+  </main>
+  <Footer locale={locale} languageHref={languageHref} />
+</BaseLayout>
+
+<style>
+  .case-hero {
+    padding: 7.8rem 0 0;
+    color: var(--paper);
+    background:
+      radial-gradient(circle at 76% 26%, rgba(212, 242, 92, 0.09), transparent 25rem),
+      linear-gradient(rgba(245, 244, 237, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245, 244, 237, 0.035) 1px, transparent 1px),
+      var(--dark);
+    background-size: auto, 68px 68px, 68px 68px, auto;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--paper-muted);
+    font-size: 0.78rem;
+    text-decoration: none;
+  }
+
+  .back span {
+    color: var(--signal);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(26rem, 1.2fr);
+    align-items: center;
+    gap: clamp(3rem, 7vw, 7rem);
+    padding: clamp(3rem, 6vw, 5.5rem) 0;
+  }
+
+  .eyebrow {
+    margin: 0;
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    max-width: 11ch;
+    margin: 1.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 5.8vw, 6rem);
+    font-weight: 720;
+    letter-spacing: -0.065em;
+    line-height: 0.94;
+    text-wrap: balance;
+  }
+
+  .summary {
+    max-width: 34rem;
+    margin: 1.6rem 0 0;
+    color: var(--paper-muted);
+    font-size: 1.05rem;
+  }
+
+  .hero-media {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .hero-media video,
+  .hero-architecture {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border: 1px solid rgba(245, 244, 237, 0.17);
+    background: #070907;
+  }
+
+  .hero-media video {
+    object-fit: cover;
+  }
+
+  .hero-media figcaption {
+    margin-top: 0.65rem;
+    color: var(--paper-muted);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+  }
+
+  .hero-architecture {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 1.5rem;
+    background:
+      linear-gradient(rgba(212, 242, 92, 0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212, 242, 92, 0.055) 1px, transparent 1px),
+      #070907;
+    background-size: 28px 28px;
+  }
+
+  .hero-architecture span {
+    padding: 0.55rem;
+    border: 1px solid rgba(245, 244, 237, 0.28);
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    text-align: center;
+  }
+
+  .hero-architecture i {
+    color: var(--signal);
+    font-style: normal;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid rgba(245, 244, 237, 0.16);
+  }
+
+  .facts > div {
+    min-width: 0;
+    padding: 1.4rem 1rem 1.7rem 0;
+    border-right: 1px solid rgba(245, 244, 237, 0.16);
+  }
+
+  .facts > div:not(:first-child) {
+    padding-left: 1rem;
+  }
+
+  .facts > div:last-child {
+    border-right: 0;
+  }
+
+  .facts strong,
+  .facts span,
+  .facts small {
+    display: block;
+  }
+
+  .facts strong {
+    color: var(--signal);
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
+    letter-spacing: -0.035em;
+  }
+
+  .facts span {
+    margin-top: 0.15rem;
+    font-size: 0.76rem;
+  }
+
+  .facts small {
+    margin-top: 0.25rem;
+    color: var(--paper-muted);
+    font-family: var(--font-mono);
+    font-size: 0.52rem;
+  }
+
+  .narrative {
+    background: var(--paper);
+  }
+
+  .two-column,
+  .scope-grid {
+    display: grid;
+    grid-template-columns: minmax(14rem, 0.7fr) minmax(20rem, 1.3fr);
+    gap: clamp(3rem, 9vw, 9rem);
+  }
+
+  .scope-grid {
+    margin-top: clamp(4rem, 9vw, 8rem);
+    padding-top: clamp(3rem, 6vw, 5rem);
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .narrative h2,
+  .flow-section h2,
+  .section-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 4.5vw, 4.5rem);
+    font-weight: 720;
+    letter-spacing: -0.055em;
+    line-height: 0.95;
+  }
+
+  .prose {
+    max-width: 48rem;
+  }
+
+  .prose p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: clamp(1.05rem, 1.7vw, 1.25rem);
+    line-height: 1.75;
+  }
+
+  .prose p + p {
+    margin-top: 1.2rem;
+  }
+
+  .scope-grid ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: scope;
+  }
+
+  .scope-grid li {
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.75rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--line);
+    color: var(--ink-soft);
+    counter-increment: scope;
+  }
+
+  .scope-grid li::before {
+    content: '0' counter(scope);
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+  }
+
+  .flow-section {
+    padding: clamp(4rem, 8vw, 7rem) 0;
+    background: var(--paper-alt);
+  }
+
+  .flow-map {
+    display: grid;
+    grid-template-columns: repeat(var(--flow-count), minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 2.5rem;
+    background: var(--line-strong);
+    border: 1px solid var(--line-strong);
+  }
+
+  .flow-node {
+    position: relative;
+    min-height: 8rem;
+    padding: 1rem;
+    background: var(--paper-alt);
+  }
+
+  .flow-node:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: -0.55rem;
+    display: grid;
+    place-items: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--dark);
+    background: var(--signal);
+    font-size: 0.65rem;
+    transform: translateY(-50%);
+  }
+
+  .flow-node span {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+  }
+
+  .flow-node strong {
+    display: block;
+    margin-top: 2rem;
+    font-family: var(--font-display);
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+
+  .decisions {
+    background: var(--paper);
+  }
+
+  .section-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: end;
+    gap: 2rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .decision-grid article {
+    padding: 2rem 2rem 0 0;
+  }
+
+  .decision-grid article + article {
+    padding-left: 2rem;
+    border-left: 1px solid var(--line);
+  }
+
+  .decision-grid span {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+  }
+
+  .decision-grid h3 {
+    margin: 1.3rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2.4vw, 2rem);
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+  }
+
+  .decision-grid p {
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+  }
+
+  .evidence-section {
+    color: var(--paper);
+    background: var(--dark);
+  }
+
+  .section-head.inverse {
+    border-bottom-color: rgba(245, 244, 237, 0.18);
+  }
+
+  .inverse :global(.section-kicker) {
+    color: var(--signal);
+  }
+
+  .evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: 2rem;
+    background: rgba(245, 244, 237, 0.18);
+    border: 1px solid rgba(245, 244, 237, 0.18);
+  }
+
+  .evidence-grid article {
+    padding: clamp(1.5rem, 3vw, 2.4rem);
+    background: var(--dark);
+  }
+
+  .evidence-grid strong {
+    color: var(--signal);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 3.3rem);
+    letter-spacing: -0.055em;
+  }
+
+  .evidence-grid h3 {
+    margin: 1.1rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+
+  .evidence-grid p {
+    margin: 0.65rem 0 0;
+    color: var(--paper-muted);
+    font-size: 0.85rem;
+  }
+
+  .limitations {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(245, 244, 237, 0.18);
+  }
+
+  .limitations > p {
+    margin: 0;
+    color: var(--signal);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .limitations ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .limitations li {
+    padding: 0.75rem 0;
+    border-top: 1px solid rgba(245, 244, 237, 0.1);
+    color: var(--paper-muted);
+  }
+
+  .limitations li:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .gallery-section {
+    background: var(--paper);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .gallery figure {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .gallery video {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--dark);
+  }
+
+  .gallery figcaption {
+    margin-top: 0.55rem;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+  }
+
+  .next-case {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr minmax(20rem, 2fr) auto;
+    align-items: center;
+    gap: 2rem;
+    padding: clamp(3rem, 7vw, 6rem) max(2rem, calc((100vw - 1180px) / 2));
+    color: var(--dark);
+    background: var(--signal);
+    text-decoration: none;
+  }
+
+  .next-case span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .next-case strong {
+    max-width: 16ch;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4.5vw, 4.2rem);
+    letter-spacing: -0.055em;
+    line-height: 0.95;
+  }
+
+  .next-case i {
+    font-size: 2.2rem;
+    font-style: normal;
+    transition: transform 220ms var(--ease);
+  }
+
+  .next-case:hover i {
+    transform: translateX(0.4rem);
+  }
+
+  @media (max-width: 980px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-media {
+      width: min(100%, 48rem);
+      margin-left: auto;
+    }
+
+    .flow-map {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .case-hero {
+      padding-top: 6.5rem;
+    }
+
+    .hero-grid {
+      gap: 2.5rem;
+      padding: 2.5rem 0 3rem;
+    }
+
+    .facts {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .facts > div:nth-child(2) {
+      border-right: 0;
+    }
+
+    .facts > div:nth-child(-n + 2) {
+      border-bottom: 1px solid rgba(245, 244, 237, 0.16);
+    }
+
+    .two-column,
+    .scope-grid,
+    .section-head,
+    .limitations {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .decision-grid,
+    .evidence-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .decision-grid article,
+    .decision-grid article + article {
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+
+    .gallery {
+      display: flex;
+      overflow-x: auto;
+      margin-inline: -0.75rem;
+      padding: 0 0.75rem 1rem;
+      scroll-snap-type: x mandatory;
+    }
+
+    .gallery figure {
+      flex: 0 0 82%;
+      scroll-snap-align: start;
+    }
+
+    .next-case {
+      grid-template-columns: 1fr auto;
+      padding-inline: 0.75rem;
+    }
+
+    .next-case span {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .flow-map {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .hero-architecture {
+      flex-wrap: wrap;
+    }
+
+    .hero-architecture i {
+      display: none;
+    }
+  }
+</style>

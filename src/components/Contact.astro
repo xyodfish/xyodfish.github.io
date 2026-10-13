@@ -9,49 +9,90 @@ const { locale } = Astro.props;
 const t = copy[locale];
 ---
 
-<section class="section" id="contact">
+<section class="section contact" id="contact">
   <div class="site-shell reveal">
-    <div class="band">
-      <div>
-        <p class="section-kicker">{t.nav.contact}</p>
-        <h2 class="section-title">{t.contact.title}</h2>
-        <p class="section-intro">{t.contact.body}</p>
-        <div class="tag-row stack">
-          {t.about.stackItems.map((item) => (
-            <span class="tag">{item}</span>
-          ))}
-        </div>
+    <p class="section-kicker">{t.nav.contact} / 04</p>
+    <div class="contact-grid">
+      <h2>{locale === 'zh' ? '聊聊机器人运动。' : 'Let’s talk robot motion.'}</h2>
+      <div class="contact-copy">
+        <p>{t.contact.body}</p>
+        <a href={siteMeta.github} target="_blank" rel="noopener noreferrer">
+          <span>{t.contact.github}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
-      <a class="btn btn-primary" href={siteMeta.github} target="_blank" rel="noopener noreferrer">
-        {t.contact.github}
-      </a>
     </div>
   </div>
 </section>
 
 <style>
-  .band {
-    display: flex;
+  .contact {
+    background: var(--paper-alt);
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: minmax(20rem, 1.35fr) minmax(17rem, 0.65fr);
     align-items: end;
+    gap: clamp(3rem, 8vw, 8rem);
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  h2 {
+    max-width: 9ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 8rem);
+    font-weight: 720;
+    letter-spacing: -0.075em;
+    line-height: 0.88;
+  }
+
+  .contact-copy > p {
+    max-width: 26rem;
+    margin: 0 0 2rem;
+    color: var(--ink-soft);
+    font-size: 1.05rem;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
-    padding: clamp(1.75rem, 4vw, 2.4rem) 0;
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    gap: 2rem;
+    padding: 1rem 1.15rem;
+    color: var(--paper);
+    background: var(--dark);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-decoration: none;
+    transition:
+      color 220ms var(--ease),
+      background 220ms var(--ease);
   }
 
-  .section-title {
-    max-width: none;
+  a:hover {
+    color: var(--dark);
+    background: var(--signal);
   }
 
-  .stack {
-    margin-top: 1rem;
+  a span:last-child {
+    color: var(--signal);
   }
 
-  @media (max-width: 640px) {
-    .band {
-      flex-direction: column;
-      align-items: start;
+  a:hover span:last-child {
+    color: var(--dark);
+  }
+
+  @media (max-width: 720px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    h2 {
+      font-size: clamp(3.5rem, 18vw, 6rem);
     }
   }
 </style>

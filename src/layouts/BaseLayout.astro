@@ -6,12 +6,14 @@ type Props = {
   locale: Locale;
   title: string;
   description: string;
+  alternateZhPath?: string;
+  alternateEnPath?: string;
 };
 
-const { locale, title, description } = Astro.props;
+const { locale, title, description, alternateZhPath = '/', alternateEnPath = '/en/' } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const alternateZh = new URL('/', Astro.site).toString();
-const alternateEn = new URL('/en/', Astro.site).toString();
+const alternateZh = new URL(alternateZhPath, Astro.site).toString();
+const alternateEn = new URL(alternateEnPath, Astro.site).toString();
 ---
 
 <!doctype html>
@@ -21,6 +23,7 @@ const alternateEn = new URL('/en/', Astro.site).toString();
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#11130f" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -39,26 +42,35 @@ const alternateEn = new URL('/en/', Astro.site).toString();
     <title>{title}</title>
   </head>
   <body>
+    <a class="skip-link" href="#content">{locale === 'zh' ? '跳到主要内容' : 'Skip to content'}</a>
     <slot />
     <script>
-      const nodes = document.querySelectorAll('.reveal');
+      const videos = document.querySelectorAll('[data-lazy-video]');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if ('IntersectionObserver' in window && nodes.length) {
-        const observer = new IntersectionObserver(
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        const videoObserver = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
+              const video = entry.target as HTMLVideoElement;
+
               if (entry.isIntersecting) {
-                entry.target.classList.add('is-in');
-                observer.unobserve(entry.target);
+                if (video.readyState < 2) {
+                  video.load();
+                }
+
+                video.play().catch(() => {});
+              } else {
+                video.pause();
               }
             });
           },
-          { threshold: 0.16, rootMargin: '0px 0px -8% 0px' },
+          { threshold: 0.22, rootMargin: '120px 0px' },
         );
 
-        nodes.forEach((node) => observer.observe(node));
+        videos.forEach((video) => videoObserver.observe(video));
       } else {
-        nodes.forEach((node) => node.classList.add('is-in'));
+        videos.forEach((video) => (video as HTMLVideoElement).pause());
       }
     </script>
   </body>
